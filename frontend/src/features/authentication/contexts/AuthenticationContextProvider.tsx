@@ -19,21 +19,21 @@ const AuthenticationContext = createContext<AuthenticationContextType | null>(
   null,
 );
 
-export function useAuthentication() {
-  return useContext(AuthenticationContext);
-}
-
-// export function useAuthentication(): AuthenticationContextType {
-//   const context = useContext(AuthenticationContext);
-
-//   if (!context) {
-//     throw new Error(
-//       "useAuthentication must be used within AuthenticationProvider"
-//     );
-//   }
-
-//   return context;
+// export function useAuthentication() {
+//   return useContext(AuthenticationContext);
 // }
+
+export function useAuthentication(): AuthenticationContextType {
+  const context = useContext(AuthenticationContext);
+
+  if (!context) {
+    throw new Error(
+      "useAuthentication must be used within AuthenticationProvider"
+    );
+  }
+
+  return context;
+}
 
 export function AuthenticationContextProvider() {
   const [user, setUser] = useState<User | null>(null);
@@ -47,7 +47,8 @@ export function AuthenticationContextProvider() {
 
   const login = async (email: string, password: string) => {
     const response = await fetch(
-      import.meta.env.VITE_API_URL + "/api/v1/authentication/login",
+      // import.meta.env.VITE_API_URL + "/api/v1/authentication/login",
+      "http://localhost:8080/api/v1/authentication/login",
       {
         method: "POST",
         headers: {

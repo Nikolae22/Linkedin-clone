@@ -18,28 +18,32 @@ const router = createBrowserRouter([
         element: <Feed />,
       },
       {
-        path: "/login",
+        path: "login",
         element: <Login />,
       },
       {
-        path: "/signup",
+        path: "signup",
         element: <Signup />,
       },
       {
-        path: "/request-password-reset",
+        path: "request-password-reset",
         element: <ResetPassword />,
       },
       {
-        path: "/verify-email",
+        path: "verify-email",
         element: <VerifyEmail />,
       },
     ],
   },
+  {
+    path:'/loginn',
+    element: <Login/>,
+    
+  }
 ]);
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <RouterProvider router={router} />
-    <div>Whats app</div>
   </StrictMode>,
 );

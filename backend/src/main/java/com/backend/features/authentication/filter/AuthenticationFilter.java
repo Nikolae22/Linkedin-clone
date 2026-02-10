@@ -63,7 +63,7 @@ public class AuthenticationFilter extends HttpFilter {
 
             String email=jsonWebToken.getEmailFromToken(token);
             AuthenticationUser user=authenticationService.getUser(email);
-            request.getAttribute("authenticationUser");
+            request.setAttribute("authenticationUser",user);
             chain.doFilter(request,response);
 
 

@@ -8,9 +8,12 @@ import com.backend.features.authentication.utility.EmailService;
 import com.backend.features.authentication.utility.Encoder;
 import com.backend.features.authentication.utility.JsonWebToken;
 import jakarta.mail.MessagingException;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.UnsupportedEncodingException;
 import java.security.SecureRandom;
@@ -27,6 +30,10 @@ public class AuthenticationService {
     private final JsonWebToken jsonWebToken;
     private final EmailService emailService;
     private final int durationInMinutes = 1;
+
+    //helper per fare le query
+    @PersistenceContext
+    private EntityManager entityManager;
 
 
     public AuthenticationUser getUser(String email) {
@@ -135,9 +142,9 @@ public class AuthenticationService {
             authenticationUserRepository.save(user.get());
             String subject = "Password Reset";
             String body = String.format("""
-                    You requested a password reset.
-
-                    Enter this code to reset your password: %s. The code will expire in %s minutes.""",
+                            You requested a password reset.
+                            
+                            Enter this code to reset your password: %s. The code will expire in %s minutes.""",
                     passwordResetToken, durationInMinutes);
             try {
                 emailService.sendEmail(email, subject, body);
@@ -162,6 +169,28 @@ public class AuthenticationService {
             throw new IllegalArgumentException("Password reset token expired.");
         } else {
             throw new IllegalArgumentException("Password reset token failed.");
+        }
+    }
+
+    public AuthenticationUser updateUserProfile(Long id, String firstName, String lastName, String company, String position, String location) {
+        AuthenticationUser user = authenticationUserRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+        if (firstName != null) user.setFirstName(firstName);
+        if (lastName != null) user.setLastName(lastName);
+        if (company != null) user.setCompany(company);
+        if (position != null) user.setPosition(position);
+        if (location != null) user.setLocation(location);
+
+        return authenticationUserRepository.save(user);
+    }
+
+    @Transactional
+    public void deleteUser(Long id) {
+        AuthenticationUser user=entityManager.find(AuthenticationUser.class,id);
+        if (user !=null) {
+            entityManager.createNativeQuery("DELETE FROM posts_likes where user_id = :userId")
+                            .setParameter("userId",id)
+                                    .executeUpdate();
+            authenticationUserRepository.deleteById(id);
         }
     }
 }
