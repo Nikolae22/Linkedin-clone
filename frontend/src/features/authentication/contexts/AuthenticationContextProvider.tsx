@@ -1,15 +1,31 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type Dispatch,
+  type SetStateAction,
+} from "react";
 import { Navigate, Outlet, useLocation } from "react-router";
 import { Loader } from "../../../components/loader/Loader";
 
-interface User {
+export interface User {
   id: string;
   email: string;
+  name: string;
   emailVerified: boolean;
+  profilePicture?: string;
+  firstName?: string;
+  lastName?: string;
+  company?: string;
+  position?: string;
+  location?: string;
+  profileComplete: boolean;
 }
 
 interface AuthenticationContextType {
   user: User | null;
+  setUser: Dispatch<SetStateAction<User | null>>;
   login: (email: string, password: string) => Promise<void>;
   signup: (email: string, password: string) => Promise<void>;
   logout: () => void;
@@ -23,6 +39,9 @@ const AuthenticationContext = createContext<AuthenticationContextType | null>(
 //   return useContext(AuthenticationContext);
 // }
 
+//warning perche sto esportato questo sia la funzione dovrei dividero
+// uso questo sotto cosi a typescript risolvo il problemam del null
+//e non mi da erore negli altri file 
 export function useAuthentication(): AuthenticationContextType {
   const context = useContext(AuthenticationContext);
 
@@ -38,12 +57,12 @@ export function useAuthentication(): AuthenticationContextType {
 export function AuthenticationContextProvider() {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const location=useLocation();
+  const location = useLocation();
 
   const isOnAuthPage =
-    location.pathname === "/login" ||
-    location.pathname === "/signup" ||
-    location.pathname === "/reqeust-password-reset";
+    location.pathname === "/authentication/login" ||
+    location.pathname === "/authentication/signup" ||
+    location.pathname === "/authentication/reqeust-password-reset";
 
   const login = async (email: string, password: string) => {
     const response = await fetch(
@@ -118,23 +137,32 @@ export function AuthenticationContextProvider() {
       return;
     }
     fetchUser();
-  }, [user,location.pathname]);
+  }, [user, location.pathname]);
 
   if (isLoading) {
     return <Loader />;
   }
 
   if (!isLoading && !user && !isOnAuthPage) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/authentication/login" />;
   }
 
-  if (user && user?.emailVerified && isOnAuthPage) {
+  if (
+    user &&
+    !user.emailVerified &&
+    location.pathname !== "/authentication/verify-email"
+  ) {
+    return <Navigate to="/authentication/verify-email" />;
+  }
+
+  if (user && isOnAuthPage) {
     return <Navigate to="/" />;
   }
 
   return (
-    <AuthenticationContext.Provider value={{ user, login, signup, logout }}>
-      {user && !user.emailVerified ? <Navigate to="/verify-email" /> : null}
+    <AuthenticationContext.Provider
+      value={{ user, login, signup, logout, setUser }}
+    >
       <Outlet />
     </AuthenticationContext.Provider>
   );

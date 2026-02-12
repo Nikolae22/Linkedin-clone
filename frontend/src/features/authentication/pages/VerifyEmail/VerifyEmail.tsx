@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { Box } from "../../components/Box/Box";
-import { Input } from "../../components/input/Input";
-import { Layout } from "../../components/Layout/Layout";
+import { Input } from "../../../../components/input/Input";
 import classes from "./VerifyEmail.module.scss";
-import { Button } from "../../components/Button/Button";
+import { Button } from "../../../../components/Button/Button";
 import { useNavigate } from "react-router";
 
 export default function VerifyEmail() {
@@ -65,16 +64,18 @@ export default function VerifyEmail() {
   };
 
   return (
-    <Layout className={classes.root}>
+    <div className={classes.root}>
       <Box>
         <h1>Verify Email</h1>
-        <form onSubmit={async(e)=>{
-          e.preventDefault()
-          setIsLoading(true);
-          const code=e.currentTarget.code.value;
-          await validateEmail(code);
-          setIsLoading(false)
-        }}>
+        <form
+          onSubmit={async (e) => {
+            e.preventDefault();
+            setIsLoading(true);
+            const code = e.currentTarget.code.value;
+            await validateEmail(code);
+            setIsLoading(false);
+          }}
+        >
           <p>Only one step to complete the registration. Verify your email</p>
 
           <Input type="text" label="Verification code" key="code" name="code" />
@@ -93,6 +94,6 @@ export default function VerifyEmail() {
           </Button>
         </form>
       </Box>
-    </Layout>
+    </div>
   );
 }

@@ -1,7 +1,7 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Box } from "../../components/Box/Box";
-import { Button } from "../../components/Button/Button";
-import { Input } from "../../components/input/Input";
+import { Button } from "../../../../components/Button/Button";
+import { Input } from "../../../../components/input/Input";
 import classes from "./Login.module.scss";
 import { Separator } from "../../components/Separator/Separator";
 import { useState, type SubmitEvent } from "react";
@@ -60,11 +60,13 @@ export default function Login() {
           <Button type="submit" disabled={isLoading}>
             {isLoading ? "...." : "Sign in"}
           </Button>
-          <Link to="/request-password-reset">Forgot password?</Link>
+          <Link to="/authentication/request-password-reset">
+            Forgot password?
+          </Link>
         </form>
         <Separator>Or</Separator>
         <div className={classes.register}>
-          New to LinkedIn? <Link to="signup">Join now</Link>
+          New to LinkedIn? <Link to="/authentication/signup">Join now</Link>
         </div>
       </Box>
     </div>
